@@ -99,17 +99,17 @@ def check_odt(studentInformation, informationAboutReport, inputStream):
 
     # proc
     # определение ОС, для проверки наличия данных в буфере ввода
-    read = None
-    if sys.platform == "linux" or sys.platform == "linux2" or sys.platform == "darwin":
-        import select
-        read, _, _ = select.select([sys.stdin], [], [], 0)
-        logging.debug("OS:\tUnix")
-    elif sys.platform == "win32":
-        import msvcrt
-        logging.debug("OS:\tWindows")
-        read = msvcrt.kbhit()
-    else:
-        logging.error("ошибка определения ОС")
+   # read = None
+   # if sys.platform == "linux" or sys.platform == "linux2" or sys.platform == "darwin":
+   #     import select
+   #     read, _, _ = select.select([sys.stdin], [], [], 0)
+   #     logging.debug("OS:\tUnix")
+   # elif sys.platform == "win32":
+   #     import msvcrt
+   #     logging.debug("OS:\tWindows")
+   #     read = msvcrt.kbhit()
+   # else:
+   #    logging.error("ошибка определения ОС")
 
     if inputStream is None:  # and len(read):  # перенаправлен поток
         logging.debug("\tОбнаружен поток ввода")
