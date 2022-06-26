@@ -4,7 +4,7 @@ on:
   push:
       paths:
         report-validator/validator-odt/*
-        .github/workflows/
+        .github/workflows/*
         
 jobs:
   test:
