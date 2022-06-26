@@ -23,4 +23,4 @@ jobs:
         pip install tox tox-gh-actions
         pip install odfpy
     - name: Test with tox
-      run: tox report-validator/validator-odt/
+      run: tox ./report-validator/validator-odt/
