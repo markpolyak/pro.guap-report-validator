@@ -1,3 +1,4 @@
+from urllib.request import Request
 from fastapi import Body, FastAPI, status
 from api.handlers import router
 from fastapi.encoders import jsonable_encoder
@@ -16,11 +17,11 @@ api = get_api()
 
 
 @api.exception_handler(RequestValidationError)
-async def validation_exception_handler(request, exc):
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Overrides FastAPI default status code for validation errors from 422 to 400."""
     status_json = "error"
     parser = None
-    message = exc.errors()
+    message = str(exc)
     results = []
     response_json = ValidatorResponseBadRequest(
         status=status_json, message=message, parser=parser, results=results)

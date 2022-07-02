@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Optional, List
+from typing import Optional, List
 
 from pydantic import BaseModel
 
@@ -51,7 +51,7 @@ class ValidatorResponse(BaseModel):
 
 class ValidatorResponseBadRequest(BaseModel):
     status: str
-    message: List[Dict]
+    message: str
     parser: str = None
     results: List[str]
 
@@ -60,3 +60,5 @@ class ReportDescriptionWithLink(BaseModel):
     student: Student
     report: Report
     report_link: str
+    username: str
+    password: str

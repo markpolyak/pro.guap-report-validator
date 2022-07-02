@@ -10,8 +10,6 @@ router = APIRouter()
 
 @router.post(
     '/api/validation_report_multipart',
-    status_code=200,
-    response_model=ValidatorResponse,
     responses={
         200: {'model': ValidatorResponse},
         400: {'model': ValidatorResponseBadRequest},
@@ -25,14 +23,14 @@ def report_validation_multipart(response: Response,
                                 file: UploadFile = File(...)
                                 ):
     try:
-        validator_reports = ValidatorReports(report_description, file.filename)
+        validator_reports = ValidatorReports(
+            report_description.dict(), file.filename, file.file)
         if len(validator_reports.validation_report()) == 0:
-            validator_reports.save_report(file.file.read())
+            # validator_reports.save_report(file.file.read())
             response.status_code = status.HTTP_200_OK
             status_json = "Успешно"
             parser = validator_reports.format_file
             results = validator_reports.validation_report()
-
         else:
             status_json = "С ошибками"
             parser = validator_reports.format_file
@@ -55,7 +53,6 @@ def report_validation_multipart(response: Response,
 
 @router.post('/api/validation_report',
              status_code=200,
-             response_model=ValidatorResponse,
              responses={
                  200: {'model': ValidatorResponse},
                  400: {'model': ValidatorResponseBadRequest},
@@ -66,7 +63,8 @@ def report_validation(response: Response,
                       report_description: ReportDescriptionWithLink = Body(...)
                       ):
     try:
-        file_uploader = FileUploader(report_description.report_link)
+        file_uploader = FileUploader(
+            report_description.report_link, report_description.username, report_description.password)
         file = file_uploader.upload_file()
         status_code_file_uploader = file['status_code']
         if status_code_file_uploader != 200:
@@ -83,9 +81,9 @@ def report_validation(response: Response,
             )
 
         validator_reports = ValidatorReports(
-            report_description, file['filename'])
+            report_description.dict(), file['filename'], file['file_binary'])
         if len(validator_reports.validation_report()) == 0:
-            validator_reports.save_report(file['file_binary'])
+            # validator_reports.save_report(file['file_binary'])
             response.status_code = status.HTTP_200_OK
             status_json = "Успешно"
             parser = validator_reports.format_file
