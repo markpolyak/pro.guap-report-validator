@@ -1,10 +1,14 @@
 from api.schemas import ReportDescription, ValidatorResponse, ReportDescriptionWithLink, ValidatorResponseBadRequest
-from fastapi import APIRouter, File, UploadFile, Body, Response, status
+from fastapi import APIRouter, File, UploadFile, Body, Response, status, Depends, Request
 from api.utils import ValidatorReports, FileUploader
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+import datetime
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 
+limiter = Limiter(key_func=get_remote_address)
 router = APIRouter()
 
 
@@ -14,15 +18,20 @@ router = APIRouter()
         200: {'model': ValidatorResponse},
         400: {'model': ValidatorResponseBadRequest},
         422: {'model': ValidatorResponse},
-        500: {'model': ValidatorResponse}
+        500: {'model': ValidatorResponseBadRequest}
     }
 )
-def report_validation_multipart(response: Response,
+# @limiter.limit("/minute")
+def report_validation_multipart(request: Request,
+                                response: Response,
                                 report_description: ReportDescription = Body(
                                     ...),
                                 file: UploadFile = File(...)
                                 ):
     try:
+        # uploade_at format check
+        datetime.datetime.strptime(
+            report_description.report.uploaded_at, "%Y-%m-%dT%H:%M:%SZ")
         validator_reports = ValidatorReports(
             report_description.dict(), file.filename, file.file)
         if len(validator_reports.validation_report()) == 0:
@@ -42,10 +51,20 @@ def report_validation_multipart(response: Response,
             parser=parser,
             results=results
         )
-    except Exception:
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return ValidatorResponse(
+    except ValueError as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return ValidatorResponseBadRequest(
             status='error',
+            message=str(e),
+            parser=None,
+            results=[]
+        )
+
+    except Exception as e:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return ValidatorResponseBadRequest(
+            status='error',
+            message=str(e),
             parser=None,
             results=[]
         )
@@ -57,24 +76,24 @@ def report_validation_multipart(response: Response,
                  200: {'model': ValidatorResponse},
                  400: {'model': ValidatorResponseBadRequest},
                  422: {'model': ValidatorResponse},
-                 500: {'model': ValidatorResponse}
+                 500: {'model': ValidatorResponseBadRequest}
              })
-def report_validation(response: Response,
-                      report_description: ReportDescriptionWithLink = Body(...)
+# @limiter.limit("5/minute")
+def report_validation(request: Request,
+                      response: Response,
+                      report_description: ReportDescriptionWithLink = Body(
+                          ...),
                       ):
     try:
+        datetime.datetime.strptime(
+            report_description.report.uploaded_at, "%Y-%m-%dT%H:%M:%SZ")
         file_uploader = FileUploader(
             report_description.report_link, report_description.username, report_description.password)
         file = file_uploader.upload_file()
         status_code_file_uploader = file['status_code']
         if status_code_file_uploader != 200:
-            response.status_code = status_code_file_uploader
-            status_json = "Ошибка"
-            message = file['message']
-            parser = None
-            results = []
             response_json = ValidatorResponseBadRequest(
-                status=status_json, message=message, parser=parser, results=results)
+                status="Ошибка", message=file['message'], parser=None, results=[])
             return JSONResponse(
                 status_code=status_code_file_uploader,
                 content=jsonable_encoder(response_json)
@@ -99,10 +118,20 @@ def report_validation(response: Response,
             parser=parser,
             results=results
         )
-    except Exception:
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return ValidatorResponse(
+    except ValueError as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return ValidatorResponseBadRequest(
             status='error',
+            message=str(e),
+            parser=None,
+            results=[]
+        )
+
+    except Exception as e:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return ValidatorResponseBadRequest(
+            status='error',
+            message=str(e),
             parser=None,
             results=[]
         )

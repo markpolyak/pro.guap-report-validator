@@ -1,15 +1,19 @@
 from urllib.request import Request
-from fastapi import Body, FastAPI, status
-from api.handlers import router
+from fastapi import FastAPI, status
+from api.handlers import router, limiter
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from api.schemas import ValidatorResponseBadRequest
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
 
 
 def get_api() -> FastAPI:
     api = FastAPI()
     api.include_router(router)
+    api.state.limiter = limiter
+    api.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
     return api
 
 
