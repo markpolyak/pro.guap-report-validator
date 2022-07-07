@@ -1,4 +1,3 @@
-from socket import SO_RCVLOWAT
 from setuptools import setup
 
 setup(
@@ -8,7 +7,7 @@ setup(
     author_email='madrid211514@gmail.com',
     description='backend for checking reports',
     scripts=['api/main.py'],
-    python_requires='>=3.9.13',
+    python_requires='>=3.7.13',
     install_requires=[
         'fastapi==0.78.0',
         'uvicorn==0.18.1',
