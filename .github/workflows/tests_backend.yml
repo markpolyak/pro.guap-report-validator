@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.6', '3.7', '3.8', '3.9','3.10']
+        python-version: ['3.9.13','3.10']
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -33,4 +33,5 @@ jobs:
           pip install -e .
       - name: Run tests
         run: |
+          cd ./report-validator/backend/
           pytest ./tests/test_validation_multipart_endpoint.py
