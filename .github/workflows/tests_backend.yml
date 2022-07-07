@@ -28,9 +28,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd .\report-validator\backend\
+          cd ./report-validator/backend/
           python -m pip install --upgrade pip
           pip install -e .
       - name: Run tests
         run: |
-          pytest .\tests\test_validation_multipart_endpoint.py
+          pytest ./tests/test_validation_multipart_endpoint.py
