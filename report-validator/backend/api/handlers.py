@@ -6,8 +6,11 @@ from fastapi.encoders import jsonable_encoder
 import datetime
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+import os
 
 
+RATE_LIMIT_FIRST_ENDPOINT = os.environ.get('RATE_LIMIT_FIRST_ENDPOINT', '')
+RATE_LIMIT_SECOND_ENDPOINT = os.environ.get('RATE_LIMIT_SECOND_ENDPOINT', '')
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter()
 
@@ -21,7 +24,7 @@ router = APIRouter()
         500: {'model': ValidatorResponseBadRequest}
     }
 )
-# @limiter.limit("/minute")
+@limiter.limit(f"{RATE_LIMIT_FIRST_ENDPOINT}/minute")
 def report_validation_multipart(request: Request,
                                 response: Response,
                                 report_description: ReportDescription = Body(
@@ -78,7 +81,7 @@ def report_validation_multipart(request: Request,
                  422: {'model': ValidatorResponse},
                  500: {'model': ValidatorResponseBadRequest}
              })
-# @limiter.limit("5/minute")
+@limiter.limit(f"{RATE_LIMIT_SECOND_ENDPOINT}/minute")
 def report_validation(request: Request,
                       response: Response,
                       report_description: ReportDescriptionWithLink = Body(
