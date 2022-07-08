@@ -39,3 +39,17 @@ pip install -e .
 ```bash
 uvicorn api.main:api --reload
 ```
+
+### Docker
+
+#### 1) Build
+
+```bash
+docker build -t myimage .
+```
+
+#### 2) Run (u can not use the rate limit)
+
+```bash
+docker run -e RATE_LIMIT_FIRST_ENDPOINT=5 -e RATE_LIMIT_SECOND_ENDPOINT=1 -p 127.0.0.1:8000:8000 --name mycontainer myimage
+```
