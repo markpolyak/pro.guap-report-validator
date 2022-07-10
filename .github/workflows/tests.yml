@@ -3,8 +3,8 @@ name: Tests
 on:
   push:
     paths: 
-      - ./report-validator/ParserReportPdf/test.py
-      - ./report-validator/ParserReportPdf/ParserReportPdf.py
+      - report-validator/ParserReportPdf/test.py
+      - report-validator/ParserReportPdf/ParserReportPdf.py
       - .github/workflows/tests.yml
 
 jobs:
