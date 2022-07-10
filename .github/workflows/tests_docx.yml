@@ -4,6 +4,8 @@ on:
  push:
    paths:
      - ./report-validator/validator_docx/check_docx.py
+     - ./report-validator/validator_docx/check_docx_test.py
+     - .github/workflows/tests_docx.yml
 
 jobs:
  test:
