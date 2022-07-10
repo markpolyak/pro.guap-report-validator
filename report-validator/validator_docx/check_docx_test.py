@@ -26,6 +26,27 @@ report = {
   "uploaded_at": "2022-06-01T00:00:00Z"
 }
 
+f1 = open('docx_files//lab.docx','rb')
+f2 = open('docx_files//lab_title.docx','rb')
+f3 = open('docx_files//lab_wrong_struc.docx','rb')
+f4 = open('docx_files//kontr.docx','rb')
+f5 = open('docx_files//ref.docx','rb')
+f6 = open('docx_files//kursrab.docx','rb')
+f7 = open('docx_files//kurspr.docx','rb')
+f8 = open('docx_files//lab_lot_err.docx','rb')
+
+reports = {
+    "lab": f1.read(),
+    "lab_title" : f2.read(),
+    "lab_wrong_struc" : f3.read(),
+    "kontr" : f4.read(),
+    "ref" : f5.read(),
+    "kursrab" : f6.read(),
+    "kurspr" : f7.read(),
+    "lab_lot_err" : f8.read()
+}
+
+"""
 reports = {
     "lab": open('docx_files//lab.docx','rb').read(),
     "lab_title" : open('docx_files//lab_title.docx','rb').read(),
@@ -36,6 +57,7 @@ reports = {
     "kurspr" : open('docx_files//kurspr.docx','rb').read(),
     "lab_lot_err" : open('docx_files//lab_lot_err.docx','rb').read()
 }
+"""
 
 #тесты для проверки входных данных
 #словарь отчета без одного ключа
@@ -310,3 +332,12 @@ def test_lab_lot_err():
     assert res[2][0:12] == "Неверный год"
     assert res[3][0:90] == 'Неверная структура отчета. Не найдено: "'+rep["report_structure"][2]+'"'
     assert res[4][0:165] == 'Элементы отчета: "Название работы", "Название предмета", "Результат выполнения работы", "Исходный код программы с комментариями" — нарушают его корректную структуру.'
+    
+f1.close()
+f2.close()
+f3.close()
+f4.close()
+f5.close()
+f6.close()
+f7.close()
+f8.close()
