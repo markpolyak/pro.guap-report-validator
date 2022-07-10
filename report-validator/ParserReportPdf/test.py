@@ -24,58 +24,57 @@ report_info = {
       "uploaded_at": "2022-06-01T00:00:00Z"
 }
 
-#with open("kontr.pdf", "rb") as filehandle:
-#    file = filehandle.read()
 
-file = "kontr.pdf"
+file = open("kontr.pdf", "rb")
+file_read = file.read()
 
 def test_task_type():
     r_inf = copy.deepcopy(report_info);
     r_inf["task_type"] = "Лабораторная работа"
-    assert parser_report_pdf(file, student, r_inf) == ['Отсутствует тип работы, ожидалось: Лабораторная работа']
+    assert parser_report_pdf(file_read, student, r_inf) == ['Отсутствует тип работы, ожидалось: Лабораторная работа']
 
 def test_student_name():
     stud = copy.deepcopy(student);
     stud["surname"] = "Лисичкин"
-    assert parser_report_pdf(file, stud, report_info) == ['Отсутствует ФИО студента, ожидалось: А.Ю. Лисичкин ']
+    assert parser_report_pdf(file_read, stud, report_info) == ['Отсутствует ФИО студента, ожидалось: А.Ю. Лисичкин ']
     
 def test_student_group():
     stud = copy.deepcopy(student);
     stud["group"] = "5132"
-    assert parser_report_pdf(file, stud, report_info) == ['Отсутствует группа студента, ожидалось: 5132']
+    assert parser_report_pdf(file_read, stud, report_info) == ['Отсутствует группа студента, ожидалось: 5132']
     
 def test_subject_name():
     r_inf = copy.deepcopy(report_info);
     r_inf["subject_name"] = "Основы программирования"
-    assert parser_report_pdf(file, student, r_inf) == ['Отсутствует название предмета, ожидалось: Основы программирования']
+    assert parser_report_pdf(file_read, student, r_inf) == ['Отсутствует название предмета, ожидалось: Основы программирования']
     
 def test_task_name():
     r_inf = copy.deepcopy(report_info);
     r_inf["task_name"] = "Элементарные функции LISP для работы со списками"
-    assert parser_report_pdf(file, student, r_inf) == ['Отсутствует название работы, ожидалось: Элементарные функции LISP для работы со списками']
+    assert parser_report_pdf(file_read, student, r_inf) == ['Отсутствует название работы, ожидалось: Элементарные функции LISP для работы со списками']
     
 def test_teacher_name():
     r_inf = copy.deepcopy(report_info);
     r_inf["teacher"]["name"] = "Иван"
-    assert parser_report_pdf(file, student, r_inf) == ['Отсутствует ФИО преподавателя, ожидалось: И. Федоров ']
+    assert parser_report_pdf(file_read, student, r_inf) == ['Отсутствует ФИО преподавателя, ожидалось: И. Федоров ']
     
 def test_teacher_status():
     r_inf = copy.deepcopy(report_info);
     r_inf["teacher"]["status"] = "проф., д-р техн. наук"
-    assert parser_report_pdf(file, student, r_inf) == ['Отсутствует должность, ожидалось: проф., д-р техн. наук']
+    assert parser_report_pdf(file_read, student, r_inf) == ['Отсутствует должность, ожидалось: проф., д-р техн. наук']
     
 def test_year():
     r_inf = copy.deepcopy(report_info);
     r_inf["uploaded_at"] = "2021-06-01T00:00:00Z"
-    assert parser_report_pdf(file, student, r_inf) == ['Отсутствует год отчета, ожидалось: 2021']
+    assert parser_report_pdf(file_read, student, r_inf) == ['Отсутствует год отчета, ожидалось: 2021']
     
 def test_report_structure():
     r_inf = copy.deepcopy(report_info);
     r_inf["report_structure"] = [ "Цель", "Задание", "Ход работы", "Результат выполнения", "Выводы"]
-    assert parser_report_pdf(file, student, r_inf) == ['В содержимом отчета отсутствует раздел: Ход работы']
+    assert parser_report_pdf(file_read, student, r_inf) == ['В содержимом отчета отсутствует раздел: Ход работы']
     
 def test_successful():
-    assert parser_report_pdf(file, student, report_info) == []
+    assert parser_report_pdf(file_read, student, report_info) == []
     
 def test_some_errors():
     stud = copy.deepcopy(student);
@@ -84,11 +83,10 @@ def test_some_errors():
     r_inf["teacher"]["name"] = "Петр";
     r_inf["subject_name"] = "Основы программирования";
     r_inf["report_structure"] = [ "Цель", "Задание", "Ход работы", "Результат выполнения", "Выводы"]
-    assert parser_report_pdf(file, stud, r_inf) == ['Отсутствует ФИО преподавателя, ожидалось: П. Федоров ', 'Отсутствует название предмета, ожидалось: Основы программирования', 'Отсутствует группа студента, ожидалось: 4936', 'В содержимом отчета отсутствует раздел: Ход работы']
-    
-#with open("lab.pdf", "rb") as filehandle:
-#    file2 = filehandle.read()
-file2 = "lab.pdf"
+    assert parser_report_pdf(file_read, stud, r_inf) == ['Отсутствует ФИО преподавателя, ожидалось: П. Федоров ', 'Отсутствует название предмета, ожидалось: Основы программирования', 'Отсутствует группа студента, ожидалось: 4936', 'В содержимом отчета отсутствует раздел: Ход работы']
+
+file2 = open("lab.pdf", "rb")
+file2_read = file2.read()
     
 def test_other_page0():
     student2 = {
@@ -113,11 +111,14 @@ def test_other_page0():
       "uploaded_at": "2022-06-01T00:00:00Z"
 }
 
-    assert parser_report_pdf(file2, student2, report_info2) == []  
+    assert parser_report_pdf(file2_read, student2, report_info2) == []  
 
-#with open("kontr (1).pdf", "rb") as filehandle:
-#   file3 = filehandle.read()
-file3 = "kontr (1).pdf"
+file3 = open("kontr (1).pdf", "rb")
+file3_read = file3.read()
 
 def test_incorrect_position():
-    assert parser_report_pdf(file3, student, report_info) == ['Отсутствует ФИО преподавателя, ожидалось: В. Федоров ', 'Отсутствует группа студента, ожидалось: 5131', 'Отсутствует год отчета, ожидалось: 2022', 'Неправильная позиция элемента название работы, ожидалось: тип работы', 'Неправильная позиция элемента тип работы, ожидалось: название работы', 'В содержимом отчета отсутствует раздел: Задание']    
+    assert parser_report_pdf(file3_read, student, report_info) == ['Отсутствует ФИО преподавателя, ожидалось: В. Федоров ', 'Отсутствует группа студента, ожидалось: 5131', 'Отсутствует год отчета, ожидалось: 2022', 'Неправильная позиция элемента название работы, ожидалось: тип работы', 'Неправильная позиция элемента тип работы, ожидалось: название работы', 'В содержимом отчета отсутствует раздел: Задание']    
+    
+file.close()
+file2.close()
+file3.close()
