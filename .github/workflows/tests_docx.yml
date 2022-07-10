@@ -2,7 +2,8 @@ name: Check docx file
 
 on: 
  push:
-
+   paths:
+     - ./report-validator/validator_docx/check_docx.py
 
 jobs:
  test:
