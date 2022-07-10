@@ -281,9 +281,12 @@ if __name__ == "__main__":
         #преобразуем в словари принятые аргументы
         arg1 = json.loads(sys.argv[1])
         arg2 = json.loads(sys.argv[2])
-        file = sys.argv[3] #путь к файлу
+        #file = sys.argv[3] #путь к файлу
         #передаем в функцию буферизированный поток байт
-        check_docx(arg1, arg2, io.BytesIO(open("{}".format(file),'rb').read()))
+        #check_docx(arg1, arg2, io.BytesIO(open("{}".format(file),'rb').read()))
+        file = open("{}".format(sys.argv[3]),'rb')
+        check_docx(arg1, arg2, io.BytesIO(file.read()))
+        file.close()
     elif len(sys.argv) > 4:
         print("Слишком много аргументов")
     elif len(sys.argv) < 4:
