@@ -5,9 +5,7 @@ import datetime
 import sys
 from operator import itemgetter
 
-
 def check_docx(infstudent, infreport, document):
-
     #проверка на количество ключей в словаре отчета
     if len(infreport.keys()) != 6:
         sys.exit(1)
