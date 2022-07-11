@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /pro.guap-report-validator/report-validator/backend
 
-COPY . /pro.guap-report-validator/report-validator/backend
+COPY . /pro.guap-report-validator/
 
 RUN pip install -e .
 
