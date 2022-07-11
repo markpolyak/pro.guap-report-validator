@@ -1,0 +1,37 @@
+name: tests_backend
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" , "backend-for-validation-reports"]
+  pull_request:
+    branches: [ "main", "backend-for-validation-reports" ]
+
+
+jobs:
+  test_with_multipart_endpoint:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ['3.7', '3.8', '3.9','3.10']
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          cd ./report-validator/backend/
+          python -m pip install --upgrade pip
+          pip install -e .
+      - name: Run tests
+        run: |
+          cd ./report-validator/backend/
+          pytest ./tests/test_validation_multipart_endpoint.py
