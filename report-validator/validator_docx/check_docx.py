@@ -5,37 +5,47 @@ import datetime
 import sys
 from operator import itemgetter
 
-def check_docx(infstudent, infreport, document):
+def check_docx(infstudent, infreport, document) -> list:
+
+    if type(infstudent) != dict:
+        raise TypeError('Информация о студенте не является словарем')
+
+    if type(infreport) != dict:
+        raise TypeError('Информация об отчете не является словарем')
+
+    if type(infreport["teacher"]) != dict:
+        raise TypeError('Ключ "teacher" словаря отчета не является словарем')
+    
     #проверка на количество ключей в словаре отчета
     if len(infreport.keys()) != 6:
-        sys.exit(1)
+        raise ValueError('В словаре отчета недостаточное количество ключей')
 
     #проверка на количество ключей в словаре студента
     len_stud = len(infstudent.keys())
     if not (len_stud == 4 or (len_stud == 3 and 'patronymic' not in infstudent.keys())):
-        sys.exit(2)
+        raise ValueError('В словаре студента недостаточное количество ключей')
 
     #проверка на количество ключей в словаре преподавателя
     if type(infreport["teacher"]) == dict:
         len_teach = len(infreport["teacher"].keys())
         if not (len_teach == 4 or (len_teach == 3 and 'patronymic' not  in infreport["teacher"].keys())):
-            sys.exit(3)
-
+            raise ValueError('В словаре учителя недостаточное количество ключей')
+    
     #проверка на пустую строку ключей словаря студента
     for k in infstudent.keys():
         if infstudent[k] == '':
-            exit(4)
+            raise ValueError('В словаре студента ключ "'+k+'" является пустой строкой')
 
     #проверка на пустую строку ключей словаря отчета
     for k in infreport.keys():
         if infreport[k] == '':
-            exit(5)
+            raise ValueError('В словаре отчета ключ "'+k+'" является пустой строкой')
 
     #проверка на пустую строку ключей словаря преподавателя
     for k in infreport["teacher"].keys():
         if infreport["teacher"][k] == '':
-            exit(6)
-    
+            raise ValueError('В словаре учителя ключ "'+k+'" является пустой строкой')
+
     #извлечение содержимого документа
     result = docx2txt.process(document)
    
@@ -107,6 +117,11 @@ def check_docx(infstudent, infreport, document):
                     if struc_info[2][2] !=-1:
                         struc_info[2][1] = line
                         break
+                    else:
+                        struc_info[2][2] = content[line].find("Лабораторная работа")
+                        if struc_info[2][2] !=-1:
+                            struc_info[2][1] = line
+                            break
     elif "контрольная работа" in infreport["task_type"].lower():
         for line in range(N):
             struc_info[2][2] = content[line].find(infreport["task_type"])
@@ -118,17 +133,27 @@ def check_docx(infstudent, infreport, document):
                 if struc_info[2][2] != -1:
                     struc_info[2][1] = line
                     break
+                else:
+                    struc_info[2][2] = content[line].find("Контрольная работа")
+                    if struc_info[2][2] != -1:
+                        struc_info[2][1] = line
+                        break
     elif "реферат" in infreport["task_type"].lower():
         for line in range(N):
             struc_info[2][2] = content[line].find(infreport["task_type"])
             if struc_info[2][2] != -1:
-               struc_info[2][1] = line
-               break
+                struc_info[2][1] = line
+                break
             else:
                 struc_info[2][2] = content[line].find("РЕФЕРАТ")
                 if struc_info[2][2] == 0:
                     struc_info[2][1] = line
                     break
+                else:
+                    struc_info[2][2] = content[line].find("Реферат")
+                    if struc_info[2][2] == 0:
+                        struc_info[2][1] = line
+                        break
     elif "курсовая работа" in infreport["task_type"].lower():
         for line in range(N):
             struc_info[2][2] = content[line].find(infreport["task_type"])
@@ -149,13 +174,13 @@ def check_docx(infstudent, infreport, document):
         for line in range(N):
             struc_info[2][2] = content[line].find(infreport["task_type"])
             if struc_info[2][2] != -1:
-               struc_info[2][1] = line
-               break
+                struc_info[2][1] = line
+                break
             else:
                 struc_info[2][2] = content[line].find("КУРСОВОМУ ПРОЕКТУ")
                 if struc_info[2][2] != -1:
-                   struc_info[2][1] = line
-                   break
+                    struc_info[2][1] = line
+                    break
                 else:
                     struc_info[2][2] = content[line].find("курсовому проекту")
                     if struc_info[2][2] != -1:
@@ -186,11 +211,14 @@ def check_docx(infstudent, infreport, document):
         struc_info[4][2] = content[line].find(infreport["subject_name"])
         if struc_info[4][2] != -1 and struc_info[4][1] == -1:
             struc_info[4][1] = line
-
         else:
             struc_info[4][2] = content[line].find(infreport["subject_name"].upper())
             if  struc_info[4][2] != -1 and struc_info[4][1] == -1:
                 struc_info[4][1] = line
+            else:
+                struc_info[4][2] = content[line].find(infreport["subject_name"].lower())
+                if  struc_info[4][2] != -1 and struc_info[4][1] == -1:
+                    struc_info[4][1] = line
 
         #номер группы
         struc_info[5][2] = content[line].find(str(infstudent["group"]))
@@ -269,13 +297,10 @@ def check_docx(infstudent, infreport, document):
             delim = ', '
             errors.append("Элементы отчета: "+delim.join(lst) + " — нарушают его корректную структуру. Верная структура: "+delim.join(lst_cor)+'.')
 
-    #выводим список ошибок
-    #for i in errors:
-        #print(i+'\n')
     return errors
 
 if __name__ == "__main__":
-    
+
     # вызов из консоли
     if len(sys.argv) == 4:
         #преобразуем в словари принятые аргументы
