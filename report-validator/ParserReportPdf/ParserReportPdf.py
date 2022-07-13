@@ -4,37 +4,36 @@ import sys
 import json
 import io
 
-def parser_report_pdf(pdf_document, student, report_info):
-
+def parser_report_pdf(pdf_document, student, report_info) -> list:
     if len(student) == 0 or len(report_info) == 0:
-        return 1
+        raise ValueError('Неверное количество параметров')
     # проверка количества агрументов о студенте
     if not (len(student.keys()) == 4 or (len(student.keys()) == 3 and 'patronymic' not in student.keys())): 
-        return 1
+        raise ValueError('Неверное количество ключей в описании студента')
 
     # проверка, что все параметры не пустые
     for key in student:
         if (student[key] == None and key != 'patronymic') or (student[key] == ''):
-            return 1
+            raise ValueError('Пустые параметры в описании студента')
 
     if len(report_info) != 6:
-        return 1
+        raise ValueError('Неверное количество ключей в описании отчета')
 
     # проверка, что все параметры не пустые
     for key in report_info:
         if (report_info[key] == None and key != 'report_structure') or (report_info[key] == ''):
-            return 1
+            raise ValueError('Пустые параметры в описании отчета')
 
     # проверка информации о преподавателе
     if not ('teacher' in report_info.keys()):
-        return 1
+        raise ValueError('Отсутствует описание преподавателя')
 
     if not (len(report_info['teacher']) == 4 or (len(report_info['teacher']) == 3 and not ('patronymic' in report_info["teacher"].keys()))):
-        return 1
+        raise ValueError('Неверное количество ключей в описании преподавателя')
 
     for key in report_info['teacher']:
         if (report_info['teacher'][key] == None and key != 'patronymic') or (report_info['teacher'][key] == ''):
-            return 1
+            raise ValueError('Неверное количество ключей в описании преподавателя')
 
     structure = {
     "должность": -1,
@@ -71,6 +70,7 @@ def parser_report_pdf(pdf_document, student, report_info):
         structure["ФИО преподавателя"] = textPage1.find(techer_name)
    
     #проверка типа работы
+    #индекс, с которого нужно проверять тип
     start_index = 0
     if structure["ФИО преподавателя"] != -1:
         start_index = structure["ФИО преподавателя"]
@@ -85,24 +85,36 @@ def parser_report_pdf(pdf_document, student, report_info):
         structure["тип работы"] = textPage1.find(report_info["task_type"].upper(), start_index)
 
     if structure["тип работы"] == -1:
+        structure["тип работы"] = textPage1.find(report_info["task_type"].lower(), start_index)
 
-        if report_info["task_type"] == "Лабораторная работа":
+    if structure["тип работы"] == -1:
+
+        if report_info["task_type"].lower() == "лабораторная работа":
             structure["тип работы"] = textPage1.find("лабораторной работе", start_index)
 
             if structure["тип работы"] == -1:
                 structure["тип работы"] = textPage1.find("ЛАБОРАТОРНОЙ РАБОТЕ", start_index)
 
-        elif report_info["task_type"] == "Курсовая работа":
+            if structure["тип работы"] == -1:
+                structure["тип работы"] = textPage1.find("Лабораторная работа", start_index)
+
+        elif report_info["task_type"].lower() == "курсовая работа":
             structure["тип работы"] = textPage1.find("курсовой работе", start_index)
 
             if structure["тип работы"] == -1:
                 structure["тип работы"] = textPage1.find("КУРСОВОЙ РАБОТЕ", start_index)
+
+            if structure["тип работы"] == -1:
+                structure["тип работы"] = textPage1.find("Курсовая работа", start_index)
        
-        elif report_info["task_type"] == "Курсовой проект":
+        elif report_info["task_type"].lower() == "курсовой проект":
             structure["тип работы"] = textPage1.find("курсовому проекту", start_index)
 
             if structure["тип работы"] == -1:
                 structure["тип работы"] = textPage1.find("КУРСОВОМУ ПРОЕКТУ", start_index)
+
+            if structure["тип работы"] == -1:
+                structure["тип работы"] = textPage1.find("Курсовой проект", start_index)
 
        
     #проверка названия работы
@@ -110,13 +122,21 @@ def parser_report_pdf(pdf_document, student, report_info):
     if structure["название работы"] == -1:
         structure["название работы"] = textPage1.find(report_info["task_name"].upper())
 
+    if structure["название работы"] == -1:
+        structure["название работы"] = textPage1.find(report_info["task_name"].lower())
+
     #проверка названия предмета
     structure["название предмета"] = textPage1.find(report_info["subject_name"])
     if structure["название предмета"] == -1:
         structure["название предмета"] = textPage1.find(report_info["subject_name"].upper())
+
+    if structure["название предмета"] == -1:
+        structure["название предмета"] = textPage1.find(report_info["subject_name"].lower())
    
     #проверка группы студента
     structure["группа студента"] = textPage1.find(student["group"].upper())
+    if structure["группа студента"] == -1:
+        structure["группа студента"] = textPage1.find(student["group"].lower())
    
     #проверка ФИО студента
     if 'patronymic' in student.keys() and not (student["patronymic"] is None): #есть отчество
@@ -184,8 +204,6 @@ def parser_report_pdf(pdf_document, student, report_info):
                     if report_structure[key] == False:
                         i += 1
                 if i != 0: #если остались ненайденные ключевые слова
-                    #strText = page.extractText()
-                    #strText2 = strText.replace("\s","")
                     strText = page.extract_text()
                     strText2 = re.sub("[\t\n\f\v\r]" , "", strText)
                     textPageN = re.sub(regex, " ", strText2)
