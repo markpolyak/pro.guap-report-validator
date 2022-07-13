@@ -4,29 +4,6 @@ import sys
 import json
 import io
 
-student = {
-      "name": "",
-      "patronymic": "Юрьевич",
-      "group": "5131"
-    }
-
-report_info = {
-      "subject_name": "Архитектура ЭВМ",
-      "task_name": "Представление данных в эвм типа VAX-11",
-      "task_type": "Контрольная работа",
-      "teacher": {
-        "name": "Валерий",
-        "surname": "Федоров",
-        "patronymic": None,
-        "status": "доц., канд. техн. наук"
-      },
-      "report_structure": [
-        "Цель", "Задание", "Результат выполнения", "Выводы"
-      ],
-      "uploaded_at": "2022-06-01T00:00:00Z"
-}
-
-
 def parser_report_pdf(pdf_document, student, report_info):
 
     if len(student) == 0 or len(report_info) == 0:
