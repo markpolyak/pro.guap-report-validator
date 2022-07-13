@@ -270,8 +270,8 @@ def check_docx(infstudent, infreport, document):
             errors.append("Элементы отчета: "+delim.join(lst) + " — нарушают его корректную структуру. Верная структура: "+delim.join(lst_cor)+'.')
 
     #выводим список ошибок
-    for i in errors:
-        print(i+'\n')
+    #for i in errors:
+        #print(i+'\n')
     return errors
 
 if __name__ == "__main__":
@@ -285,8 +285,10 @@ if __name__ == "__main__":
         #передаем в функцию буферизированный поток байт
         #check_docx(arg1, arg2, io.BytesIO(open("{}".format(file),'rb').read()))
         file = open("{}".format(sys.argv[3]),'rb')
-        check_docx(arg1, arg2, io.BytesIO(file.read()))
+        res = check_docx(arg1, arg2, io.BytesIO(file.read()))
         file.close()
+        for i in res:
+            print(i+'\n')
     elif len(sys.argv) > 4:
         print("Слишком много аргументов")
     elif len(sys.argv) < 4:
