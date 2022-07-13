@@ -91,7 +91,7 @@ def check_docx(infstudent, infreport, document):
                     break
 
     #тип задания
-    if "Лабораторная работа" in infreport["task_type"]:
+    if "лабораторная работа" in infreport["task_type"].lower():
         for line in range(N):
             struc_info[2][2] = content[line].find(infreport["task_type"])
             if struc_info[2][2] != -1:
@@ -107,7 +107,7 @@ def check_docx(infstudent, infreport, document):
                     if struc_info[2][2] !=-1:
                         struc_info[2][1] = line
                         break
-    elif "Контрольная работа" in infreport["task_type"]:
+    elif "контрольная работа" in infreport["task_type"].lower():
         for line in range(N):
             struc_info[2][2] = content[line].find(infreport["task_type"])
             if struc_info[2][2] != -1:
@@ -118,7 +118,7 @@ def check_docx(infstudent, infreport, document):
                 if struc_info[2][2] != -1:
                     struc_info[2][1] = line
                     break
-    elif "Реферат" in infreport["task_type"]:
+    elif "реферат" in infreport["task_type"].lower():
         for line in range(N):
             struc_info[2][2] = content[line].find(infreport["task_type"])
             if struc_info[2][2] != -1:
@@ -129,7 +129,7 @@ def check_docx(infstudent, infreport, document):
                 if struc_info[2][2] == 0:
                     struc_info[2][1] = line
                     break
-    elif "Курсовая работа" in infreport["task_type"]:
+    elif "курсовая работа" in infreport["task_type"].lower():
         for line in range(N):
             struc_info[2][2] = content[line].find(infreport["task_type"])
             if struc_info[2][2] != -1:
@@ -145,7 +145,7 @@ def check_docx(infstudent, infreport, document):
                     if struc_info[2][2] != -1:
                         struc_info[2][1] = line
                         break
-    elif "Курсовой проект" in infreport["task_type"]:
+    elif "курсовой проект" in infreport["task_type"].lower():
         for line in range(N):
             struc_info[2][2] = content[line].find(infreport["task_type"])
             if struc_info[2][2] != -1:
