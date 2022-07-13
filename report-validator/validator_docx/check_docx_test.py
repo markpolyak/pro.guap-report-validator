@@ -64,19 +64,17 @@ reports = {
 def test_rep_without_key():
     rep = deepcopy(report)
     rep.pop("uploaded_at")
-    with pytest.raises(SystemExit) as e:
+    with pytest.raises(ValueError, match=r"В словаре отчета недостаточное количество ключей") as e:
         check_docx(student, rep, io.BytesIO(reports["lab"]))
-    assert e.type == SystemExit
-    assert e.value.code == 1
+    #assert e.type == ValueError
+    #assert e.value == ValueError('В словаре отчета недостаточное количество ключей')
 
 #словарь студента без одного ключа
 def test_stud_without_key():
     stud = deepcopy(student)
     stud.pop("surname")
-    with pytest.raises(SystemExit) as e:
+    with pytest.raises(ValueError, match=r"В словаре студента недостаточное количество ключей") as e:
         check_docx(stud, report, io.BytesIO(reports["lab"]))
-    assert e.type == SystemExit
-    assert e.value.code == 2
 
 #словарь студента без ключа отчества
 #возвращается не код ошибки, программа завершается корректно с
@@ -102,10 +100,8 @@ def test_stud_none_patr():
 def test_teach_without_key():
     rep = deepcopy(report)
     rep["teacher"].pop("name")
-    with pytest.raises(SystemExit) as e:
+    with pytest.raises(ValueError, match=r"В словаре учителя недостаточное количество ключей") as e:
         check_docx(student, rep, io.BytesIO(reports["lab"]))
-    assert e.type == SystemExit
-    assert e.value.code == 3
 
 #словарь отчета без ключа отчества
 #возвращается не код ошибки, программа завершается корректно с
@@ -131,28 +127,22 @@ def test_teach_none_patr():
 def test_stud_empty_key():
     stud = deepcopy(student)
     stud["name"] =''
-    with pytest.raises(SystemExit) as e:
+    with pytest.raises(ValueError, match=r"В словаре студента ключ .* является пустой строкой") as e:
         check_docx(stud, report, io.BytesIO(reports["lab"]))
-    assert e.type == SystemExit
-    assert e.value.code == 4
 
 #словарь отчета с пустой строкой в ключе
 def test_rep_empty_key():
     rep = deepcopy(report)
     rep["task_name"] = ''
-    with pytest.raises(SystemExit) as e:
+    with pytest.raises(ValueError, match=r"В словаре отчета ключ .* является пустой строкой") as e:
         check_docx(student, rep, io.BytesIO(reports["lab"]))
-    assert e.type == SystemExit
-    assert e.value.code == 5
-
+    
 #словарь учителя с пустой строкой в ключе
 def test_teach_empty_key():
     rep = deepcopy(report)
     rep["teacher"]["patronymic"] = ''
-    with pytest.raises(SystemExit) as e:
+    with pytest.raises(ValueError, match=r"В словаре учителя ключ .* является пустой строкой") as e:
         check_docx(student, rep, io.BytesIO(reports["lab"]))
-    assert e.type == SystemExit
-    assert e.value.code == 6
 
 
 #тесты для проверки правильных отчетов
@@ -332,7 +322,7 @@ def test_lab_lot_err():
     assert res[2][0:12] == "Неверный год"
     assert res[3][0:90] == 'Неверная структура отчета. Не найдено: "'+rep["report_structure"][2]+'"'
     assert res[4][0:165] == 'Элементы отчета: "Название работы", "Название предмета", "Результат выполнения работы", "Исходный код программы с комментариями" — нарушают его корректную структуру.'
-    
+
 f1.close()
 f2.close()
 f3.close()
