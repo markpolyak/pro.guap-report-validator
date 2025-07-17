@@ -1,5 +1,0 @@
-flask
-python-docx
-python-dateutil
-flask-cors
-pytest
