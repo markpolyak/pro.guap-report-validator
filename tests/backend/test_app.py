@@ -66,24 +66,25 @@ def test_valid_report(client):
         "uploaded_at": "2022-06-01T00:00:00Z"
     }
 
-    # 发送请求 - 仅传递文件作为 input_stream
+    # 发送请求 - 仅通过 input_stream 上传文件，表单数据需要传递给表单字段
     buffer = create_test_docx(content)
     data = {
         'student_info': json.dumps(student_info),
         'report_info': json.dumps(report_info),
     }
 
-    # 需要将 buffer 文件作为 files 字段上传，而不是 input_stream
     response = client.post(
         '/validate',
         data=data,
         content_type='multipart/form-data',
-        files={'file': (buffer, 'report.docx')}  # 上传文件
+        buffered=True,
+        input_stream=buffer  # 上传文件
     )
 
     assert response.status_code == 200
     errors = json.loads(response.data)
     assert len(errors) == 0
+
 
 
 def test_missing_sections(client):
