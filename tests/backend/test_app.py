@@ -73,13 +73,16 @@ def test_valid_report(client):
         'report_info': json.dumps(report_info),
     }
 
-    response = client.post(
-        '/validate',
-        data=data,
-        content_type='multipart/form-data',
-        buffered=True,
-        input_stream=buffer  # 上传文件
-    )
+response = client.post(
+    '/validate',
+    data={
+        'student_info': json.dumps(student_info),
+        'report_info': json.dumps(report_info),
+    },
+    files={'file': (buffer, 'test.docx')},  # 在这里上传文件
+    content_type='multipart/form-data',
+)
+
 
     assert response.status_code == 200
     errors = json.loads(response.data)
@@ -131,13 +134,16 @@ def test_missing_sections(client):
         'student_info': json.dumps(student_info),
         'report_info': json.dumps(report_info),
     }
-    response = client.post(
-        '/validate',
-        data=data,
-        content_type='multipart/form-data',
-        buffered=True,
-        input_stream=buffer
-    )
+ response = client.post(
+    '/validate',
+    data={
+        'student_info': json.dumps(student_info),
+        'report_info': json.dumps(report_info),
+    },
+    files={'file': (buffer, 'test.docx')},  # 在这里上传文件
+    content_type='multipart/form-data',
+)
+
     
     assert response.status_code == 200
     errors = json.loads(response.data)
@@ -188,13 +194,16 @@ def test_wrong_title(client):
         'student_info': json.dumps(student_info),
         'report_info': json.dumps(report_info),
     }
-    response = client.post(
-        '/validate',
-        data=data,
-        content_type='multipart/form-data',
-        buffered=True,
-        input_stream=buffer
-    )
+response = client.post(
+    '/validate',
+    data={
+        'student_info': json.dumps(student_info),
+        'report_info': json.dumps(report_info),
+    },
+    files={'file': (buffer, 'test.docx')},  # 在这里上传文件
+    content_type='multipart/form-data',
+)
+
     
     assert response.status_code == 200
     errors = json.loads(response.data)
