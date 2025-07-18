@@ -1,0 +1,37 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+    border: none;
+}
+
+.card-header {
+    border-radius: 0 !important;
+}
+
+.list-group-item {
+    border-left: none;
+    border-right: none;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+}
+
+.alert {
+    border-radius: 10px;
+}
+
+footer {
+    background-color: #e9ecef;
+    border-top: 1px solid #dee2e6;
+}
