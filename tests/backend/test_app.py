@@ -64,11 +64,12 @@ def test_valid_report(client):
     }
 
     # 发送请求
-    with open(docx_path, 'rb') as f:
-        response = client.post('/validate', data={
-            'student_info': json.dumps(student_info),
-            'report_info': json.dumps(report_info),
-        }, files={'file': f})
+  with open(docx_path, 'rb') as f:
+    data = {
+        'student_info': json.dumps(student_info),
+        'report_info': json.dumps(report_info),
+    }
+    response = client.post('/validate', data=data, content_type='multipart/form-data', buffered=True, input_stream=f)
 
     # 清理
     os.remove(docx_path)
