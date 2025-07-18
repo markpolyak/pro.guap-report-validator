@@ -1,10 +1,15 @@
+import sys
 import os
 import json
 import pytest
-from backend.app import app
-from werkzeug.datastructures import FileStorage
-import sys
+from unittest.mock import patch, MagicMock
+from docx import Document
+from io import BytesIO
+
+# 修复导入路径
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
+from backend.app import app
 
 @pytest.fixture
 def client():
@@ -12,16 +17,16 @@ def client():
     with app.test_client() as client:
         yield client
 
-
 def create_test_docx(content):
     """创建测试DOCX文件"""
-    from docx import Document
     doc = Document()
-    doc.add_paragraph(content)
-    temp_path = 'test.docx'
-    doc.save(temp_path)
-    return temp_path
-
+    for line in content.split('\n'):
+        if line.strip():
+            doc.add_paragraph(line.strip())
+    buffer = BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+    return buffer
 
 def test_valid_report(client):
     # 创建测试文档
@@ -39,8 +44,7 @@ def test_valid_report(client):
     Выводы: Задание выполнено
     Санкт-Петербург 2022
     """
-    docx_path = create_test_docx(content)
-
+    
     # 准备表单数据
     student_info = {
         "name": "Иван",
@@ -48,7 +52,7 @@ def test_valid_report(client):
         "patronymic": "Иванович",
         "group": "4931"
     }
-
+    
     report_info = {
         "subject_name": "Операционные системы",
         "task_name": "ЛР1. Знакомство с командным интерпретатором bash",
@@ -62,23 +66,24 @@ def test_valid_report(client):
         "report_structure": ["Цель", "Задание", "Результат", "Выводы"],
         "uploaded_at": "2022-06-01T00:00:00Z"
     }
-
-    # 发送请求
-  with open(docx_path, 'rb') as f:
+    
+    # 发送请求 - 修复后的方式
+    buffer = create_test_docx(content)
     data = {
         'student_info': json.dumps(student_info),
         'report_info': json.dumps(report_info),
     }
-    response = client.post('/validate', data=data, content_type='multipart/form-data', buffered=True, input_stream=f)
-
-    # 清理
-    os.remove(docx_path)
-
-    # 检查响应
+    response = client.post(
+        '/validate',
+        data=data,
+        content_type='multipart/form-data',
+        buffered=True,
+        input_stream=buffer
+    )
+    
     assert response.status_code == 200
     errors = json.loads(response.data)
     assert len(errors) == 0
-
 
 def test_missing_sections(client):
     # 创建测试文档（缺少"Выводы"章节）
@@ -95,8 +100,7 @@ def test_missing_sections(client):
     Результат: Успешно
     Санкт-Петербург 2022
     """
-    docx_path = create_test_docx(content)
-
+    
     # 准备表单数据
     student_info = {
         "name": "Иван",
@@ -104,7 +108,7 @@ def test_missing_sections(client):
         "patronymic": "Иванович",
         "group": "4931"
     }
-
+    
     report_info = {
         "subject_name": "Операционные системы",
         "task_name": "ЛР1. Знакомство с командным интерпретатором bash",
@@ -118,22 +122,24 @@ def test_missing_sections(client):
         "report_structure": ["Цель", "Задание", "Результат", "Выводы"],
         "uploaded_at": "2022-06-01T00:00:00Z"
     }
-
-    # 发送请求
-    with open(docx_path, 'rb') as f:
-        response = client.post('/validate', data={
-            'student_info': json.dumps(student_info),
-            'report_info': json.dumps(report_info),
-        }, files={'file': f})
-
-    # 清理
-    os.remove(docx_path)
-
-    # 检查响应
+    
+    # 发送请求 - 修复后的方式
+    buffer = create_test_docx(content)
+    data = {
+        'student_info': json.dumps(student_info),
+        'report_info': json.dumps(report_info),
+    }
+    response = client.post(
+        '/validate',
+        data=data,
+        content_type='multipart/form-data',
+        buffered=True,
+        input_stream=buffer
+    )
+    
     assert response.status_code == 200
     errors = json.loads(response.data)
     assert "Отсутствует раздел: Выводы" in errors
-
 
 def test_wrong_title(client):
     # 创建测试文档（标题页缺少组别和年份）
@@ -151,8 +157,7 @@ def test_wrong_title(client):
     Выводы: Задание выполнено
     Санкт-Петербург
     """
-    docx_path = create_test_docx(content)
-
+    
     # 准备表单数据
     student_info = {
         "name": "Иван",
@@ -160,7 +165,7 @@ def test_wrong_title(client):
         "patronymic": "Иванович",
         "group": "4931"
     }
-
+    
     report_info = {
         "subject_name": "Операционные системы",
         "task_name": "ЛР1. Знакомство с командным интерпретатором bash",
@@ -174,18 +179,21 @@ def test_wrong_title(client):
         "report_structure": ["Цель", "Задание", "Результат", "Выводы"],
         "uploaded_at": "2022-06-01T00:00:00Z"
     }
-
-    # 发送请求
-    with open(docx_path, 'rb') as f:
-        response = client.post('/validate', data={
-            'student_info': json.dumps(student_info),
-            'report_info': json.dumps(report_info),
-        }, files={'file': f})
-
-    # 清理
-    os.remove(docx_path)
-
-    # 检查响应
+    
+    # 发送请求 - 修复后的方式
+    buffer = create_test_docx(content)
+    data = {
+        'student_info': json.dumps(student_info),
+        'report_info': json.dumps(report_info),
+    }
+    response = client.post(
+        '/validate',
+        data=data,
+        content_type='multipart/form-data',
+        buffered=True,
+        input_stream=buffer
+    )
+    
     assert response.status_code == 200
     errors = json.loads(response.data)
     assert "Не найдено: группа студента" in errors
