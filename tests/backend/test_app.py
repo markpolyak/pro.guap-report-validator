@@ -2,14 +2,12 @@ import sys
 import os
 import json
 import pytest
-from unittest.mock import patch, MagicMock
 from docx import Document
 from io import BytesIO
+from backend.app import app
 
 # 修复导入路径
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-
-from backend.app import app
 
 @pytest.fixture
 def client():
@@ -66,34 +64,28 @@ def test_valid_report(client):
         "uploaded_at": "2022-06-01T00:00:00Z"
     }
 
-    # 发送请求 - 仅通过 input_stream 上传文件，表单数据需要传递给表单字段
+    # 创建测试文档
     buffer = create_test_docx(content)
-    data = {
-        'student_info': json.dumps(student_info),
-        'report_info': json.dumps(report_info),
-    }
 
+    # 发送请求
     response = client.post(
-    '/validate',
-    data={
-        'student_info': json.dumps(student_info),
-        'report_info': json.dumps(report_info),
-    },
-    files={'file': (buffer, 'test.docx')},  # 正确处理文件
-)
+        '/validate',
+        data={
+            'student_info': json.dumps(student_info),
+            'report_info': json.dumps(report_info),
+            'file': (buffer, 'test.docx')  # 将文件放入 data 中
+        },
+    )
 
-
-
+    # 断言响应
     assert response.status_code == 200
     errors = json.loads(response.data)
     assert len(errors) == 0
 
-
-
 def test_missing_sections(client):
     # 创建测试文档（缺少"Выводы"章节）
     content = """
-    МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ
+    МИНИСТЕРСТВО НАУКИ И ВЫСШЕМ ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ
     Санкт-Петербургский государственный университет аэрокосмического приборостроения
     Кафедра №43
     Отчет по лабораторной работе №1
@@ -128,23 +120,20 @@ def test_missing_sections(client):
         "uploaded_at": "2022-06-01T00:00:00Z"
     }
     
-    # 发送请求 - 修复后的方式
+    # 创建测试文档
     buffer = create_test_docx(content)
-    data = {
-        'student_info': json.dumps(student_info),
-        'report_info': json.dumps(report_info),
-    }
+
+    # 发送请求
     response = client.post(
-    '/validate',
-    data={
-        'student_info': json.dumps(student_info),
-        'report_info': json.dumps(report_info),
-    },
-    files={'file': (buffer, 'test.docx')},  # 正确处理文件
-)
+        '/validate',
+        data={
+            'student_info': json.dumps(student_info),
+            'report_info': json.dumps(report_info),
+            'file': (buffer, 'test.docx')  # 将文件放入 data 中
+        },
+    )
 
-
-    
+    # 断言响应
     assert response.status_code == 200
     errors = json.loads(response.data)
     assert "Отсутствует раздел: Выводы" in errors
@@ -188,23 +177,20 @@ def test_wrong_title(client):
         "uploaded_at": "2022-06-01T00:00:00Z"
     }
     
-    # 发送请求 - 修复后的方式
+    # 创建测试文档
     buffer = create_test_docx(content)
-    data = {
-        'student_info': json.dumps(student_info),
-        'report_info': json.dumps(report_info),
-    }
+
+    # 发送请求
     response = client.post(
-    '/validate',
-    data={
-        'student_info': json.dumps(student_info),
-        'report_info': json.dumps(report_info),
-    },
-    files={'file': (buffer, 'test.docx')},  # 正确处理文件
-)
+        '/validate',
+        data={
+            'student_info': json.dumps(student_info),
+            'report_info': json.dumps(report_info),
+            'file': (buffer, 'test.docx')  # 将文件放入 data 中
+        },
+    )
 
-
-    
+    # 断言响应
     assert response.status_code == 200
     errors = json.loads(response.data)
     assert "Не найдено: группа студента" in errors
