@@ -79,9 +79,9 @@ def test_valid_report(client):
         'student_info': json.dumps(student_info),
         'report_info': json.dumps(report_info),
     },
-    files={'file': (buffer, 'test.docx')},  # 在这里上传文件
-    content_type='multipart/form-data',
+    files={'file': (buffer, 'test.docx')},  # 正确处理文件
 )
+
 
 
     assert response.status_code == 200
@@ -140,9 +140,9 @@ def test_missing_sections(client):
         'student_info': json.dumps(student_info),
         'report_info': json.dumps(report_info),
     },
-    files={'file': (buffer, 'test.docx')},  # 在这里上传文件
-    content_type='multipart/form-data',
+    files={'file': (buffer, 'test.docx')},  # 正确处理文件
 )
+
 
     
     assert response.status_code == 200
@@ -200,9 +200,9 @@ def test_wrong_title(client):
         'student_info': json.dumps(student_info),
         'report_info': json.dumps(report_info),
     },
-    files={'file': (buffer, 'test.docx')},  # 在这里上传文件
-    content_type='multipart/form-data',
+    files={'file': (buffer, 'test.docx')},  # 正确处理文件
 )
+
 
     
     assert response.status_code == 200
