@@ -4,7 +4,7 @@ import uuid
 import logging
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from validator.report_validator import ReportValidator
+from backend.validator.report_validator import ReportValidator
 
 # 配置日志
 logging.basicConfig(
