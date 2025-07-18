@@ -42,9 +42,11 @@ jobs:
         pip install -r backend/requirements.txt
         pip install pytest pytest-cov
         
-    # 关键修复：设置 PYTHONPATH
-    - name: Set Python path
-      run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+    # 关键修复：设置 PYTHONPATH 并安装项目
+    - name: Set Python path and install project
+      run: |
+        echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+        pip install -e .
       
     - name: Run backend tests
       run: |
