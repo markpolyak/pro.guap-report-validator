@@ -29,7 +29,6 @@ def create_test_docx(content):
     return buffer
 
 def test_valid_report(client):
-    # 创建测试文档
     content = """
     МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ
     Санкт-Петербургский государственный университет аэрокосмического приборостроения
@@ -44,7 +43,7 @@ def test_valid_report(client):
     Выводы: Задание выполнено
     Санкт-Петербург 2022
     """
-    
+
     # 准备表单数据
     student_info = {
         "name": "Иван",
@@ -52,7 +51,7 @@ def test_valid_report(client):
         "patronymic": "Иванович",
         "group": "4931"
     }
-    
+
     report_info = {
         "subject_name": "Операционные системы",
         "task_name": "ЛР1. Знакомство с командным интерпретатором bash",
@@ -66,24 +65,26 @@ def test_valid_report(client):
         "report_structure": ["Цель", "Задание", "Результат", "Выводы"],
         "uploaded_at": "2022-06-01T00:00:00Z"
     }
-    
-    # 发送请求 - 修复后的方式
+
+    # 发送请求 - 仅传递文件作为 input_stream
     buffer = create_test_docx(content)
     data = {
         'student_info': json.dumps(student_info),
         'report_info': json.dumps(report_info),
     }
+
+    # 需要将 buffer 文件作为 files 字段上传，而不是 input_stream
     response = client.post(
         '/validate',
         data=data,
         content_type='multipart/form-data',
-        buffered=True,
-        input_stream=buffer
+        files={'file': (buffer, 'report.docx')}  # 上传文件
     )
-    
+
     assert response.status_code == 200
     errors = json.loads(response.data)
     assert len(errors) == 0
+
 
 def test_missing_sections(client):
     # 创建测试文档（缺少"Выводы"章节）
