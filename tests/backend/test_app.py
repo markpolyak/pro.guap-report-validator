@@ -22,7 +22,7 @@ def load_test_docx(file_path):
 
 def test_valid_report(client):
     # 加载测试文档
-    buffer = load_test_docx('tests/backend/test_files/valid_report.docx')
+    buffer = load_test_docx('tests/backend/valid_report.docx')
 
     # 准备表单数据
     student_info = {
