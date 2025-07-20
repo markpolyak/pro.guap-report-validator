@@ -1,0 +1,6 @@
+flask
+flask-cors
+python-docx
+python-dateutil
+pytest
+pytest-cov

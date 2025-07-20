@@ -1,0 +1,54 @@
+name: Report Validator CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'tests/**'
+      - '.github/workflows/ci-cd.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'tests/**'
+      - '.github/workflows/ci-cd.yml'
+
+jobs:
+  test-backend:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4  # 更新到最新版本
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5  # 更新到最新版本
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        pip install pytest pytest-cov python-docx
+    
+    - name: Run tests
+      run: |
+        pytest -v tests/backend/
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4  # 更新到最新版本
+      with:
+        name: test-results
+        path: |
+          tests/backend/test_report_validator.py
+          tests/backend/test_app.py
+          tests/backend/validator.py
+          tests/backend/4233K_цзя хао_ЛР1.docx
+        retention-days: 5
