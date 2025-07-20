@@ -1,5 +1,6 @@
 flask
+flask-cors
 python-docx
 python-dateutil
-flask-cors
 pytest
+pytest-cov
