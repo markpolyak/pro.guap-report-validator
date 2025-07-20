@@ -44,8 +44,9 @@ jobs:
     
     - name: Run backend tests
       run: |
-        export PYTHONPATH=.
+        export PYTHONPATH=${{ github.workspace }}
         pytest -v --cov=backend tests/backend
+
 
     
     - name: Upload coverage report
