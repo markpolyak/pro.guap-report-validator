@@ -46,7 +46,7 @@ jobs:
       run: |
         echo "📂 当前目录: $(pwd)"
         export PYTHONPATH=${{ github.workspace }}
-        pytest -m pytest tests/backend
+        pytest -v --cov=backend tests/backend
 
 
 
