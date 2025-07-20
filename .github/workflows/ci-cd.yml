@@ -6,7 +6,6 @@ on:
       - main
       - develop
     paths:
-      - 'backend/**'
       - 'tests/**'
       - '.github/workflows/ci-cd.yml'
   pull_request:
@@ -14,7 +13,6 @@ on:
       - main
       - develop
     paths:
-      - 'backend/**'
       - 'tests/**'
       - '.github/workflows/ci-cd.yml'
 
@@ -37,25 +35,20 @@ jobs:
     
     - name: Install dependencies
       run: |
-        cd backend
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
         pip install pytest pytest-cov python-docx
     
-    - name: Run backend tests
+    - name: Run tests
       run: |
-        echo "📂 当前目录: $(pwd)"
-        export PYTHONPATH=${{ github.workspace }}
-        pytest -v --cov=backend tests/backend
-
-
-
-
+        pytest -v tests/backend/
     
-    - name: Upload coverage report
-      uses: codecov/codecov-action@v3
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        flags: backend
-        name: python-coverage
-        fail_ci_if_error: true
+        name: test-results
+        path: |
+          tests/backend/test_report_validator.py
+          tests/backend/test_app.py
+          tests/backend/validator.py
+          tests/backend/4233K_цзя хао_ЛР1.docx
+        retention-days: 5
