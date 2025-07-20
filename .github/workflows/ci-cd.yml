@@ -44,9 +44,9 @@ jobs:
     
     - name: Run backend tests
       run: |
-        # 设置 PYTHONPATH
-        export PYTHONPATH=${{ github.workspace }}
-        pytest -v --cov=backend tests/backend/
+        export PYTHONPATH=.
+        pytest -v --cov=backend tests/backend
+
     
     - name: Upload coverage report
       uses: codecov/codecov-action@v3
