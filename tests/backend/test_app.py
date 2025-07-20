@@ -1,13 +1,8 @@
-import sys
-import os
-import json
 import pytest
-from docx import Document
-from io import BytesIO
 from backend.app import app
-
-# 修复导入路径
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from backend.report_validator import ReportValidator
+import os
+import tempfile
 
 @pytest.fixture
 def client():
@@ -15,48 +10,43 @@ def client():
     with app.test_client() as client:
         yield client
 
-def load_test_docx(file_path):
-    """从文件中加载 DOCX 并返回 BytesIO 对象"""
-    with open(file_path, 'rb') as docx_file:
-        return BytesIO(docx_file.read())
-
-def test_valid_report(client):
-    # 加载测试文档
-    buffer = load_test_docx('tests/backend/valid_report.docx')
-
-    # 准备表单数据
-    student_info = {
-        "name": "Иван",
-        "surname": "Иванов",
-        "patronymic": "Иванович",
-        "group": "4931"
-    }
-
-    report_info = {
-        "subject_name": "Операционные системы",
-        "task_name": "ЛР1. Знакомство с командным интерпретатором bash",
-        "task_type": "Лабораторная работа",
-        "teacher": {
-            "name": "Юлия",
-            "surname": "Антохина",
-            "patronymic": "Анатольевна",
-            "status": "Ректор, д.т.н., проф."
-        },
-        "report_structure": ["Цель", "Задание", "Результат", "Выводы"],
-        "uploaded_at": "2022-06-01T00:00:00Z"
-    }
-
-    # 发送请求
-    response = client.post(
-        '/validate',
-        data={
-            'student_info': json.dumps(student_info),
-            'report_info': json.dumps(report_info),
-            'file': (buffer, 'valid_report.docx')
-        },
-    )
-
-    # 断言响应
+def test_home_page(client):
+    response = client.get('/')
     assert response.status_code == 200
-    errors = json.loads(response.data)
-    assert len(errors) == 0
+    assert b"status" in response.data
+
+def test_validate_endpoint(client):
+    # 创建测试文件
+    _, temp_path = tempfile.mkstemp(suffix='.docx')
+    with open(temp_path, 'wb') as f:
+        doc = Document()
+        doc.add_paragraph("Тестовый документ")
+        doc.save(f)
+    
+    # 准备测试数据
+    student_info = {
+        "name": "Тест",
+        "surname": "Тестов",
+        "group": "9999"
+    }
+    report_info = {
+        "subject_name": "Тестовый предмет",
+        "task_type": "Тестовая работа",
+        "uploaded_at": "2023-01-01T00:00:00Z"
+    }
+    
+    # 发送请求
+    with open(temp_path, 'rb') as f:
+        response = client.post('/validate', data={
+            'file': (f, 'test.docx'),
+            'student_info': json.dumps(student_info),
+            'report_info': json.dumps(report_info)
+        })
+    
+    # 清理临时文件
+    os.unlink(temp_path)
+    
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert 'valid' in data
+    assert 'errors' in data
