@@ -166,6 +166,15 @@ class ReportValidator:
         # 验证必填字段
         for label, value in required_fields:
             self._check_title_page_field(label, value, required=True)
+    def _check_title_page_field(self, field_label, field_value, required=True, is_year=False):
+    """检查标题页特定字段"""
+    if not field_value and required:
+        self.errors.append(f"Отсутствует обязательное поле: {field_label}")
+        return False
+    
+    # 处理空值情况
+    if not field_value:
+        return True
 
     def _check_report_structure(self):
         """验证报告结构"""
