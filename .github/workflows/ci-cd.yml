@@ -44,8 +44,11 @@ jobs:
     
     - name: Run backend tests
       run: |
-        export PYTHONPATH=${{ github.workspace }}
+        echo "📂 当前目录: $(pwd)"
+        echo "🧪 设置 PYTHONPATH"
+        export PYTHONPATH=.
         pytest -v --cov=backend tests/backend
+
 
 
     
