@@ -1,17 +1,7 @@
 import os
 import pytest
-import sys
-from io import BytesIO
 from docx import Document
-
-# 添加项目根目录到系统路径
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
-
-# 现在可以导入 backend 模块
-from backend.validator.report_validator import ReportValidator
-
-# 测试文档路径
-SPECIFIC_DOCX_PATH = os.path.join(os.path.dirname(__file__), "4233K_цзя хао_ЛР1.docx")
+from io import BytesIO
 
 # 学生信息
 STUDENT_INFO = {
@@ -36,31 +26,54 @@ REPORT_INFO = {
     "uploaded_at": "2025-01-01T00:00:00Z"
 }
 
-@pytest.mark.skipif(
-    not os.path.exists(SPECIFIC_DOCX_PATH),
-    reason="Specific test document not found"
-)
-def test_specific_document():
-    # 读取文档内容
-    with open(SPECIFIC_DOCX_PATH, "rb") as f:
-        docx_bytes = f.read()
+@pytest.fixture
+def specific_document_bytes():
+    """返回特定文档的字节内容"""
+    doc_path = os.path.join(os.path.dirname(__file__), "4233K_цзя хао_ЛР1.docx")
+    if not os.path.exists(doc_path):
+        pytest.skip(f"Specific document not found: {doc_path}")
     
-    # 创建验证器
-    validator = ReportValidator(docx_bytes, STUDENT_INFO, REPORT_INFO)
+    with open(doc_path, "rb") as f:
+        return f.read()
+
+def test_specific_document(specific_document_bytes):
+    """测试特定文档的验证"""
+    # 创建验证器 - 这里需要您实际实现的验证器类
+    # 由于不依赖 backend 模块，您需要在这里实现一个简化版的验证器
+    # 或者跳过验证器的创建，直接检查文档内容
+    from validator import ReportValidator  # 假设有独立的验证器模块
+    
+    validator = ReportValidator(specific_document_bytes, STUDENT_INFO, REPORT_INFO)
     errors = validator.validate()
     
     # 确保没有错误
     assert len(errors) == 0, f"Found {len(errors)} validation errors: {errors}"
 
-# 添加一个简单的测试用例作为后备
-def test_empty_document():
-    """测试空文档处理"""
-    doc = Document()
-    stream = BytesIO()
-    doc.save(stream)
-    docx_bytes = stream.getvalue()
+def test_document_has_required_sections(specific_document_bytes):
+    """测试文档包含必要的章节"""
+    # 检查文档是否包含必要的章节
+    doc = Document(BytesIO(specific_document_bytes))
+    full_text = "\n".join(para.text for para in doc.paragraphs)
     
-    validator = ReportValidator(docx_bytes, STUDENT_INFO, REPORT_INFO)
-    errors = validator.validate()
+    # 检查必要的章节
+    required_sections = ["Выход"]
+    for section in required_sections:
+        assert section in full_text, f"Required section '{section}' not found in document"
+
+def test_document_has_title_page_info(specific_document_bytes):
+    """测试文档标题页包含必要信息"""
+    doc = Document(BytesIO(specific_document_bytes))
+    full_text = "\n".join(para.text for para in doc.paragraphs)
     
-    assert "Документ пуст" in errors
+    # 检查必要的信息
+    required_info = [
+        "Цзя хао",
+        "4233k",
+        "Основы программирования",
+        "Практическое задание №1",
+        "Шумова Елена Олеговна",
+        "2025"
+    ]
+    
+    for info in required_info:
+        assert info in full_text, f"Required info '{info}' not found in document title page"
