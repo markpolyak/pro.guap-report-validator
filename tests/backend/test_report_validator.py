@@ -1,13 +1,14 @@
 import os
 import pytest
-from backend.report_validator import ReportValidatorimport os
-import pytest
 import sys
+from io import BytesIO
+from docx import Document
 
-# 添加父目录到系统路径
+# 添加项目根目录到系统路径
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from backend/validator.report_validator import ReportValidator
+# 现在可以导入 backend 模块
+from backend.validator.report_validator import ReportValidator
 
 # 测试文档路径
 SPECIFIC_DOCX_PATH = os.path.join(os.path.dirname(__file__), "4233K_цзя хао_ЛР1.docx")
@@ -48,21 +49,18 @@ def test_specific_document():
     validator = ReportValidator(docx_bytes, STUDENT_INFO, REPORT_INFO)
     errors = validator.validate()
     
-    # 打印详细验证结果
-    print("\nValidation results for specific document:")
-    if not errors:
-        print("✅ All checks passed!")
-    else:
-        print("❌ Found errors:")
-        for error in errors:
-            print(f" - {error}")
-    
-    # 打印提取的文本信息
-    print("\nExtracted title page text:")
-    print(validator.title_page_text[:500] + "...")  # 只打印前500个字符
-    
-    print("\nExtracted body text:")
-    print(validator.body_text[:500] + "...")  # 只打印前500个字符
-    
     # 确保没有错误
-    assert len(errors) == 0, f"Found {len(errors)} validation errors"
+    assert len(errors) == 0, f"Found {len(errors)} validation errors: {errors}"
+
+# 添加一个简单的测试用例作为后备
+def test_empty_document():
+    """测试空文档处理"""
+    doc = Document()
+    stream = BytesIO()
+    doc.save(stream)
+    docx_bytes = stream.getvalue()
+    
+    validator = ReportValidator(docx_bytes, STUDENT_INFO, REPORT_INFO)
+    errors = validator.validate()
+    
+    assert "Документ пуст" in errors
