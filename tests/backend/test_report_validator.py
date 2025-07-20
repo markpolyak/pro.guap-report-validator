@@ -1,6 +1,13 @@
 import os
 import pytest
-from backend.report_validator import ReportValidator
+from backend.report_validator import ReportValidatorimport os
+import pytest
+import sys
+
+# 添加父目录到系统路径
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+from backend/validator.report_validator import ReportValidator
 
 # 测试文档路径
 SPECIFIC_DOCX_PATH = os.path.join(os.path.dirname(__file__), "4233K_цзя хао_ЛР1.docx")
