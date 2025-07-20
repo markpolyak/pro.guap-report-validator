@@ -5,7 +5,7 @@ from io import BytesIO
 from docx import Document
 
 # 添加项目根目录到系统路径
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 # 现在可以导入 backend 模块
 from backend.validator.report_validator import ReportValidator
