@@ -1,0 +1,48 @@
+name: Python CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+#防止同时运行多个相同的工作流实例
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+        cache: "pip"
+
+    # 安装 Python 依赖（包括 pytest）
+    - name: Install Python dependencies
+      run: |
+        # 尝试安装 requirements.txt
+        if [ -f "requirements.txt" ]; then
+          pip install -r requirements.txt
+        elif [ -f "pdf-report-checker/requirements.txt" ]; then
+          pip install -r pdf-report-checker/requirements.txt
+        else
+          # 如果找不到 requirements.txt，直接安装必要包
+          pip install pdfplumber flask pytest
+        fi
+        
+        # 确保 pytest 已安装并可执行
+        python -m pytest --version || pip install pytest
+
+    - name: Setup PYTHONPATH
+      run: echo "PYTHONPATH=${{ github.workspace }}/pdf-report-checker" >> $GITHUB_ENV
+
+    # 使用 Python 模块方式运行 pytest
+    - name: Run tests
+      run: python -m pytest pdf-report-checker/tests/

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card shadow-lg">
+    <div class="card-header bg-primary text-white">
+        <h2 class="mb-0"><i class="fas fa-upload me-2"></i>Загрузите отчет для проверки</h2>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="/check" enctype="multipart/form-data">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h4 class="border-bottom pb-2 mb-3"><i class="fas fa-user-graduate me-2"></i>Информация о студенте</h4>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Фамилия *</label>
+                            <input type="text" class="form-control" name="student_surname" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Имя *</label>
+                            <input type="text" class="form-control" name="student_name" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Отчество</label>
+                            <input type="text" class="form-control" name="student_patronymic">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Группа *</label>
+                        <input type="text" class="form-control" name="student_group" required>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h4 class="border-bottom pb-2 mb-3"><i class="fas fa-file-alt me-2"></i>Информация об отчете</h4>
+
+                    <div class="mb-3">
+                        <label class="form-label">Название предмета *</label>
+                        <input type="text" class="form-control" name="subject_name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Название задания *</label>
+                        <input type="text" class="form-control" name="task_name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Тип задания *</label>
+                        <select class="form-select" name="task_type" required>
+                            <option value="Лабораторная работа">Лабораторная работа</option>
+                            <option value="Курсовая работа">Курсовая работа</option>
+                            <option value="Дипломный проект">Дипломный проект</option>
+                            <option value="Практическая работа">Практическая работа</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Дата загрузки *</label>
+                        <input type="date" class="form-control" name="uploaded_at" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h4 class="border-bottom pb-2 mb-3"><i class="fas fa-chalkboard-teacher me-2"></i>Информация о преподавателе</h4>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Фамилия *</label>
+                            <input type="text" class="form-control" name="teacher_surname" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Имя *</label>
+                            <input type="text" class="form-control" name="teacher_name" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Отчество</label>
+                            <input type="text" class="form-control" name="teacher_patronymic">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Должность/Статус *</label>
+                        <input type="text" class="form-control" name="teacher_status" required>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h4 class="border-bottom pb-2 mb-3"><i class="fas fa-sitemap me-2"></i>Структура отчета</h4>
+
+                    <div class="mb-3">
+                        <label class="form-label">Обязательные разделы (через запятую) *</label>
+                        <textarea class="form-control" name="report_structure" rows="4" required>Цель, Задание, Выход</textarea>
+                        <div class="form-text">Перечислите обязательные разделы через запятую</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h4 class="border-bottom pb-2 mb-3"><i class="fas fa-file-pdf me-2"></i>PDF файл отчета</h4>
+
+                <div class="mb-3">
+                    <label class="form-label">Загрузите PDF файл *</label>
+                    <input class="form-control" type="file" name="report" accept=".pdf" required>
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-check-circle me-2"></i>Проверить отчет
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
